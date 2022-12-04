@@ -1,16 +1,18 @@
-import airports from '../data/airports.json'
-import Airport from '../types/airport'
+import airports from '../data/airports.json';
+import Airport from '../types/airport';
 
-export const findAirportByIata = async (iata: string): Promise<Airport | undefined> => {
-  return airports.find((airport) => airport.iata === iata.toUpperCase())
-}
+export const findAirportByIata = async (
+  iata: string
+): Promise<Airport | undefined> => {
+  return airports.find((airport) => airport.iata === iata.toUpperCase());
+};
 
 export const allAirports = async (): Promise<Airport[]> => {
-  return airports
-}
+  return airports;
+};
 
 export const searchAirports = async (query: string): Promise<Airport[]> => {
-  const regex = new RegExp(query, 'i')
+  const regex = new RegExp(query, 'i');
 
   return airports.filter(
     (airport) =>
@@ -18,5 +20,5 @@ export const searchAirports = async (query: string): Promise<Airport[]> => {
       regex.test(airport.name) ||
       regex.test(airport.city) ||
       regex.test(airport.country)
-  )
-}
+  );
+};

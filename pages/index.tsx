@@ -1,16 +1,20 @@
-import { NextPage } from "next";
-import { useState } from "react";
+import { NextPage } from 'next';
+import { useState } from 'react';
 
-import AirportListItem from "../components/airportListItem";
-import Layout from "../components/layout";
-import Search from "../components/search";
-import useApiData from "../hooks/use-api-data";
-import Airport from "../types/airport";
+import AirportListItem from '../components/airportListItem';
+import Layout from '../components/layout';
+import Search from '../components/search';
+import useApiData from '../hooks/use-api-data';
+import Airport from '../types/airport';
 
 const Page: NextPage = () => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
 
-  const airports = useApiData<Airport[]>(`/api/airports/${query}`, [query], [query]);
+  const airports = useApiData<Airport[]>(
+    `/api/airports/${query}`,
+    [query],
+    [query]
+  );
 
   return (
     <Layout>

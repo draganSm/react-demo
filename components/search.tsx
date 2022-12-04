@@ -1,15 +1,14 @@
-import { ChangeEventHandler, FC } from "react";
+import { ChangeEventHandler, FC } from 'react';
 
 type SearchProps = {
-  onChange: (value: string) => void
-}
+  onChange: (value: string) => void;
+};
 
 const Search: FC<SearchProps> = ({ onChange }) => {
-
   const handleOnChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     const { value } = event.target;
     onChange(value);
-  }
+  };
 
   return (
     <div className="mt-1 relative shadow-sm">

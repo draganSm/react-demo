@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { FC } from "react";
-import Airport from "../types/airport";
+import Link from 'next/link';
+import { FC } from 'react';
+import Airport from '../types/airport';
 
 type AirportProps = {
   airport: Airport;
