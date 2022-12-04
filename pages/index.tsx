@@ -1,5 +1,5 @@
 import { GetServerSideProps, NextPage } from 'next';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import AirportListItem from '../components/airportListItem';
 import Layout from '../components/layout';
@@ -18,12 +18,20 @@ const Page: NextPage<PageProps> = ({
   initialQuery = '',
 }) => {
   const [query, setQuery] = useState(initialQuery);
+  const [airports, setAirports] = useState(initialData);
+  const [loading, setLoading] = useState(false);
 
-  const airports = useApiData<Airport[]>(
-    `/api/airports/${query}`,
-    initialData,
-    [query]
-  );
+  const newAirports = useApiData<Airport[]>(`/api/airports/${query}`, initialData, [query]);
+  if (newAirports !== airports) {
+    // please enable network throttling in order to see the loading effect
+    setAirports(newAirports);
+    setLoading(false);
+  }
+
+  const handleQueryUpdate = useCallback((search: string) => {
+    setQuery(search);
+    setLoading(true);
+  }, []);
 
   return (
     <Layout>
@@ -31,11 +39,11 @@ const Page: NextPage<PageProps> = ({
 
       <h2 className="mt-10 text-xl font-semibold">All Airports</h2>
 
-      <Search onChange={setQuery} />
+      <Search onChange={handleQueryUpdate} value={query} />
 
       <div>
         {airports.map((airport) => (
-          <AirportListItem key={airport.iata} airport={airport} />
+          <AirportListItem key={airport.iata} airport={airport} loading={loading} />
         ))}
       </div>
     </Layout>

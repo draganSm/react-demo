@@ -1,19 +1,21 @@
-import { ChangeEventHandler, FC } from 'react';
+import { ChangeEventHandler, FC, useCallback } from 'react';
 import debounce from '../utils/debounce';
 
 type SearchProps = {
   onChange: (value: string) => void;
+  value: string;
 };
 
-const Search: FC<SearchProps> = ({ onChange }) => {
-  const handleOnChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+const Search: FC<SearchProps> = ({ onChange, value }) => {
+  const handleOnChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
     const { value } = event.target;
     onChange(value);
-  };
+  }, [onChange]);
 
   return (
     <div className="mt-1 relative shadow-sm">
       <input
+        defaultValue={value}
         type="text"
         name="query"
         id="query"

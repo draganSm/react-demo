@@ -4,12 +4,14 @@ import Airport from '../types/airport';
 
 type AirportProps = {
   airport: Airport;
+  loading?: boolean;
 };
 
-const AirportListItem: FC<AirportProps> = ({ airport }) => {
+const AirportListItem: FC<AirportProps> = ({ airport, loading }) => {
+  const skeleton = loading ? 'animate-pulse bg-gray-200' : '';
   return (
     <Link
-      className="flex items-center p-5 mt-5 text-gray-800 border border-gray-200 rounded-lg shadow-sm hover:border-blue-600 focus:border-blue-600 focus:ring focus:ring-blue-200 focus:outline-none"
+      className={`${skeleton} flex items-center p-5 mt-5 text-gray-800 border border-gray-200 rounded-lg shadow-sm hover:border-blue-600 focus:border-blue-600 focus:ring focus:ring-blue-200 focus:outline-none`}
       href={`/airports/${airport.iata.toLowerCase()}`}
     >
       <span>
