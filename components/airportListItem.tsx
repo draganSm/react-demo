@@ -11,7 +11,6 @@ const AirportListItem: FC<AirportProps> = ({ airport }) => {
     <Link
       className="flex items-center p-5 mt-5 text-gray-800 border border-gray-200 rounded-lg shadow-sm hover:border-blue-600 focus:border-blue-600 focus:ring focus:ring-blue-200 focus:outline-none"
       href={`/airports/${airport.iata.toLowerCase()}`}
-      key={airport.iata}
     >
       <span>
         {airport.name}, {airport.city}
