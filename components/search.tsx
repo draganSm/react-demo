@@ -7,10 +7,13 @@ type SearchProps = {
 };
 
 const Search: FC<SearchProps> = ({ onChange, value }) => {
-  const handleOnChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
-    const { value } = event.target;
-    onChange(value);
-  }, [onChange]);
+  const handleOnChange: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const { value } = event.target;
+      onChange(value);
+    },
+    [onChange]
+  );
 
   return (
     <div className="mt-1 relative shadow-sm">
