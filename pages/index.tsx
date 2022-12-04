@@ -17,11 +17,13 @@ const Page: NextPage<PageProps> = ({
   airports: initialData,
   initialQuery = '',
 }) => {
+  const initialPage = 0;
+  const [page, setPage] = useState(initialPage);
   const [query, setQuery] = useState(initialQuery);
   const [airports, setAirports] = useState(initialData);
   const [loading, setLoading] = useState(false);
 
-  const newAirports = useApiData<Airport[]>(`/api/airports/${query}`, initialData, [query]);
+  const newAirports = useApiData<Airport[]>(`/api/airports/page/${page}/${query}`, initialData, [query]);
   if (newAirports !== airports) {
     // please enable network throttling in order to see the loading effect
     setAirports(newAirports);
