@@ -1,11 +1,10 @@
 import { GetServerSideProps, NextPage } from 'next';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 
 import AirportListItem from '../components/airportListItem';
 import Layout from '../components/layout';
 import Search from '../components/search';
-import useApiData from '../hooks/use-api-data';
+import usePager from '../hooks/usePager';
 import { allAirports, searchAirports } from '../models/airport';
 import Airport from '../types/airport';
 import { PAGE_SIZE } from '../utils/const';
@@ -21,59 +20,48 @@ const Page: NextPage<PageProps> = ({
 }) => {
   const initialPage = 0;
   const pageBottomRef = useRef<HTMLDivElement>();
-  const lastPageIndexRef = useRef(0);
-  const [pageIndex, setPageIndex] = useState(initialPage);
   const [query, setQuery] = useState(initialQuery);
-  const [airports, setAirports] = useState(initialData);
-  const [loading, setLoading] = useState(false);
-  const [lastPageLoaded, setLastPageLoaded] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const append = lastPageIndexRef.current != -1;
-      if (pageIndex !== lastPageIndexRef.current) {
-        lastPageIndexRef.current = pageIndex;
-        try {
-          let response = await axios.get<Airport[]>(
-            `/api/airports/page/${pageIndex}/${query}`
-          );
-          let newPage = response.data;
-          if (newPage.length) {
-            setAirports(append ? airports.concat(newPage) : newPage);
-          } else {
-            setLastPageLoaded(true);
-          }
-          setLoading(false);
-          setTimeout(() => {
-            pageBottomRef.current?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'end',
-            });
-          }, 0);
-        } catch (e) {
-          // TODO: add error message
-        }
-      }
-    })();
-  }, [airports, initialData, pageIndex, query]);
+  const apiEndpointUrlFactory = useCallback(
+    (pageIndex: number) => `/api/airports/page/${pageIndex}/${query}`,
+    [query]
+  );
 
-  const handleQueryUpdate = useCallback((search: string) => {
-    // smells like a useReducer case
-    setQuery(search);
-    setLoading(true);
-    setPageIndex(0);
-    setLastPageLoaded(false);
-    lastPageIndexRef.current = -1;
+  const handlePageLoaded = useCallback(() => {
+    pageBottomRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    });
   }, []);
 
+  const {
+    items: airports,
+    loading,
+    lastPageLoaded,
+    startNewQuery,
+    loadNextPage,
+  } = usePager<Airport>(
+    initialPage,
+    initialData,
+    apiEndpointUrlFactory,
+    handlePageLoaded
+  );
+
+  const handleQueryUpdate = useCallback(
+    (search: string) => {
+      startNewQuery();
+      setQuery(search);
+    },
+    [startNewQuery]
+  );
+
   const handleNextPage = useCallback(() => {
-    setPageIndex(pageIndex + 1);
-    setLoading(true);
-  }, [pageIndex]);
+    loadNextPage();
+  }, [loadNextPage]);
 
   return (
     <Layout>
@@ -97,8 +85,9 @@ const Page: NextPage<PageProps> = ({
       {!lastPageLoaded && (
         <div className="flex justify-center my-4">
           <button
+            disabled={loading}
             onClick={handleNextPage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 disabled:bg-blue-300 hover:bg-blue-700 disabled:hover:bg-blue-300 text-white font-bold py-2 px-4 rounded"
           >
             More ...
           </button>
