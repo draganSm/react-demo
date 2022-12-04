@@ -29,8 +29,11 @@ const Page: NextPage<PageProps> = ({
   const [lastPageLoaded, setLastPageLoaded] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      console.log('initialData', initialData);
       const append = lastPageIndexRef.current != -1;
       if (pageIndex !== lastPageIndexRef.current) {
         lastPageIndexRef.current = pageIndex;
@@ -91,14 +94,16 @@ const Page: NextPage<PageProps> = ({
         ))}
       </div>
 
-      <div className="flex justify-center my-4">
-        <button
-          onClick={handleNextPage}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          More ...
-        </button>
-      </div>
+      {!lastPageLoaded && (
+        <div className="flex justify-center my-4">
+          <button
+            onClick={handleNextPage}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            More ...
+          </button>
+        </div>
+      )}
       <div ref={pageBottomRef}></div>
     </Layout>
   );

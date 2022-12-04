@@ -1,5 +1,6 @@
 import { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 import Layout from '../../components/layout';
 import { findAirportByIata } from '../../models/airport';
@@ -10,6 +11,10 @@ interface Props {
 }
 
 const Page: NextPage<Props> = ({ airport }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Layout>
       <h1 className="mb-4 text-2xl font-bold">Airport: {airport.name}</h1>
