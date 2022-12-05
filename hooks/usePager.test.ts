@@ -1,14 +1,15 @@
-import axios from "axios";
-import { renderHook, act } from '@testing-library/react'
-import usePager from "./usePager";
+import axios from 'axios';
+import { renderHook, act } from '@testing-library/react';
+import usePager from './usePager';
 
-jest.mock("axios");
+jest.mock('axios');
 
-const axiosResponseFactory = <T>(response: T[]) => new Promise((resolve) => {
-  setTimeout(() => {
-    resolve({ data: response })
-  }, 0)
-})
+const axiosResponseFactory = <T>(response: T[]) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ data: response });
+    }, 0);
+  });
 
 describe('usePager', () => {
   it('init', async () => {
@@ -16,7 +17,9 @@ describe('usePager', () => {
     let initialData = [];
     let urlFactory = jest.fn();
     let handlePageLoaded = jest.fn();
-    const { result } = renderHook(() => usePager(initialPage, initialData, urlFactory, handlePageLoaded));
+    const { result } = renderHook(() =>
+      usePager(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
 
     const { items, loading, lastPageLoaded } = result.current;
 
@@ -29,14 +32,18 @@ describe('usePager', () => {
 
   it('fetch next page', async () => {
     jest.useFakeTimers();
-    (axios.get as jest.Mock).mockResolvedValueOnce(axiosResponseFactory(['C', 'D']));
+    (axios.get as jest.Mock).mockResolvedValueOnce(
+      axiosResponseFactory(['C', 'D'])
+    );
     let urlFactory = jest.fn();
     let handlePageLoaded = jest.fn();
 
     let initialPage = 0;
     let initialData = ['A', 'B']; // "prefetched" by SSR
 
-    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+    const { result } = renderHook(() =>
+      usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
 
     await act(async () => {
       result.current.loadNextPage(); // async fn in useEffect
@@ -57,7 +64,7 @@ describe('usePager', () => {
     expect(handlePageLoaded).not.toHaveBeenCalled();
 
     await act(async () => {
-      jest.runOnlyPendingTimers();  // async post-fetch call
+      jest.runOnlyPendingTimers(); // async post-fetch call
     });
 
     // handlePageLoaded is executed async - otherwise scroll to bottom couldn't work
@@ -66,14 +73,18 @@ describe('usePager', () => {
 
   it('fetch last page', async () => {
     jest.useFakeTimers();
-    (axios.get as jest.Mock).mockResolvedValueOnce(axiosResponseFactory(['C', 'D']));
+    (axios.get as jest.Mock).mockResolvedValueOnce(
+      axiosResponseFactory(['C', 'D'])
+    );
     let urlFactory = jest.fn();
     let handlePageLoaded = jest.fn();
 
     let initialPage = 0;
     let initialData = ['A', 'B']; // "prefetched" by SSR
 
-    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+    const { result } = renderHook(() =>
+      usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
 
     // fetch 2st page
     await act(async () => {
@@ -94,15 +105,15 @@ describe('usePager', () => {
 
     // try to fetch 3rd page
     await act(async () => {
-      result.current.loadNextPage();  // async fn in useEffect
+      result.current.loadNextPage(); // async fn in useEffect
     });
 
     await act(async () => {
-      jest.runOnlyPendingTimers();  // async axios call
+      jest.runOnlyPendingTimers(); // async axios call
     });
 
     await act(async () => {
-      jest.runOnlyPendingTimers();  // async post-fetch call
+      jest.runOnlyPendingTimers(); // async post-fetch call
     });
 
     expect(result.current.lastPageLoaded).toBe(true);
@@ -110,14 +121,18 @@ describe('usePager', () => {
 
   it('start new query', async () => {
     jest.useFakeTimers();
-    (axios.get as jest.Mock).mockResolvedValueOnce(axiosResponseFactory(['C', 'D']));
+    (axios.get as jest.Mock).mockResolvedValueOnce(
+      axiosResponseFactory(['C', 'D'])
+    );
     let urlFactory = jest.fn();
     let handlePageLoaded = jest.fn();
 
     let initialPage = 0;
     let initialData = ['A', 'B']; // "prefetched" by SSR
 
-    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+    const { result } = renderHook(() =>
+      usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
 
     // fetch 2st page
     await act(async () => {
@@ -149,7 +164,9 @@ describe('usePager', () => {
     let initialPage = 0;
     let initialData = ['A', 'B']; // "prefetched" by SSR
 
-    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+    const { result } = renderHook(() =>
+      usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
 
     // fetch 2st page
     await act(async () => {
@@ -162,18 +179,22 @@ describe('usePager', () => {
 
     expect(result.current.items).toEqual([]);
     expect(result.current.lastPageLoaded).toBe(true);
-  })
+  });
 
   it('reg#001 fix - replace content', async () => {
     jest.useFakeTimers();
-    (axios.get as jest.Mock).mockResolvedValueOnce(axiosResponseFactory(['C', 'D']));
+    (axios.get as jest.Mock).mockResolvedValueOnce(
+      axiosResponseFactory(['C', 'D'])
+    );
     let urlFactory = jest.fn();
     let handlePageLoaded = jest.fn();
 
     let initialPage = 0;
     let initialData = ['A', 'B']; // "prefetched" by SSR
 
-    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+    const { result } = renderHook(() =>
+      usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
 
     // fetch 2st page
     await act(async () => {

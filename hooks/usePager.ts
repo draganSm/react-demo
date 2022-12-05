@@ -18,7 +18,6 @@ const usePager = <T>(
   const [items, setItems] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [lastPageLoaded, setLastPageLoaded] = useState(false);
-  
 
   const startNewQuery = useCallback(() => {
     setLoading(true);
