@@ -133,4 +133,58 @@ describe('usePager', () => {
     expect(result.current.loading).toBe(false);
     expect(result.current.items).toEqual(['C', 'D']);
   });
+
+  // steps to reproduce:
+  // - enter 'germannn'
+  // expected:
+  // - empty list
+  // actual:
+  // - previous list is kept
+  it('reg#001 fix', async () => {
+    jest.useFakeTimers();
+    (axios.get as jest.Mock).mockResolvedValueOnce(axiosResponseFactory([]));
+    let urlFactory = jest.fn();
+    let handlePageLoaded = jest.fn();
+
+    let initialPage = 0;
+    let initialData = ['A', 'B']; // "prefetched" by SSR
+
+    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+
+    // fetch 2st page
+    await act(async () => {
+      result.current.startNewQuery(); // async fn in useEffect
+    });
+
+    await act(async () => {
+      jest.runOnlyPendingTimers(); // async axios call
+    });
+
+    expect(result.current.items).toEqual([]);
+    expect(result.current.lastPageLoaded).toBe(true);
+  })
+
+  it('reg#001 fix - replace content', async () => {
+    jest.useFakeTimers();
+    (axios.get as jest.Mock).mockResolvedValueOnce(axiosResponseFactory(['C', 'D']));
+    let urlFactory = jest.fn();
+    let handlePageLoaded = jest.fn();
+
+    let initialPage = 0;
+    let initialData = ['A', 'B']; // "prefetched" by SSR
+
+    const { result } = renderHook(() => usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded));
+
+    // fetch 2st page
+    await act(async () => {
+      result.current.startNewQuery(); // async fn in useEffect
+    });
+
+    await act(async () => {
+      jest.runOnlyPendingTimers(); // async axios call
+    });
+
+    expect(result.current.items).toEqual(['C', 'D']);
+    expect(result.current.lastPageLoaded).toBe(false);
+  });
 });

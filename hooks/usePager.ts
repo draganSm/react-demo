@@ -13,17 +13,18 @@ const usePager = <T>(
   startNewQuery: () => void;
   loadNextPage: () => void;
 } => {
-  const lastPageIndexRef = useRef(0);
+  const [lastPageIndex, setLastPageIndex] = useState(0);
   const [pageIndex, setPageIndex] = useState(initialPage);
   const [items, setItems] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [lastPageLoaded, setLastPageLoaded] = useState(false);
+  
 
   const startNewQuery = useCallback(() => {
     setLoading(true);
     setPageIndex(0);
     setLastPageLoaded(false);
-    lastPageIndexRef.current = -1;
+    setLastPageIndex(-1);
   }, []);
 
   const loadNextPage = useCallback(() => {
@@ -33,9 +34,9 @@ const usePager = <T>(
 
   useEffect(() => {
     (async () => {
-      const append = lastPageIndexRef.current != -1;
-      if (pageIndex !== lastPageIndexRef.current) {
-        lastPageIndexRef.current = pageIndex;
+      const append = lastPageIndex != -1;
+      if (pageIndex !== lastPageIndex) {
+        setLastPageIndex(pageIndex);
         try {
           const url = urlFactory(pageIndex);
           let response = await axios.get<T[]>(url);
@@ -43,6 +44,10 @@ const usePager = <T>(
           if (newPage.length) {
             setItems(append ? items.concat(newPage) : newPage);
           } else {
+            // reg#001
+            if (pageIndex === 0) {
+              setItems([]);
+            }
             setLastPageLoaded(true);
           }
           setLoading(false);
@@ -54,7 +59,7 @@ const usePager = <T>(
         }
       }
     })();
-  }, [handlePageLoaded, items, pageIndex, urlFactory]);
+  }, [handlePageLoaded, items, pageIndex, urlFactory, lastPageIndex]);
   return { items, loading, lastPageLoaded, startNewQuery, loadNextPage };
 };
 
