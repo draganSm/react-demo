@@ -11,6 +11,13 @@ const axiosResponseFactory = <T>(response: T[]) =>
     }, 0);
   });
 
+const axiosResponseFailureFactory = <E = Error>(error: E) =>
+  new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(error);
+    }, 0);
+  });
+
 describe('usePager', () => {
   it('init', async () => {
     let initialPage = 0;
@@ -207,5 +214,44 @@ describe('usePager', () => {
 
     expect(result.current.items).toEqual(['C', 'D']);
     expect(result.current.lastPageLoaded).toBe(false);
+  });
+
+  // steps to reproduce:
+  // - disable traffic to /api/airports/*
+  // - change query or request new page
+  // - items skeleton animation will appear
+  // expected:
+  // - the loading animation is finished after some short time
+  // actual:
+  // - the animation remains on the screen
+  it('reg#002', async () => {
+    jest.useFakeTimers();
+    (axios.get as jest.Mock).mockResolvedValueOnce(
+      axiosResponseFailureFactory(Error('error'))
+    );
+    let urlFactory = jest.fn();
+    let handlePageLoaded = jest.fn();
+
+    let initialPage = 0;
+    let initialData = ['A', 'B']; // "prefetched" by SSR
+
+    const { result } = renderHook(() =>
+      usePager<string>(initialPage, initialData, urlFactory, handlePageLoaded)
+    );
+
+    await act(async () => {
+      result.current.loadNextPage(); // async fn in useEffect
+    });
+
+    expect(result.current.error).toBe(false);
+
+    await act(async () => {
+      jest.runOnlyPendingTimers(); // async axios call
+    });
+
+    expect(result.current.items).toEqual(['A', 'B']);
+    expect(result.current.loading).toBe(false);
+    expect(result.current.lastPageLoaded).toBe(false);
+    expect(result.current.error).toBe(true);
   });
 });

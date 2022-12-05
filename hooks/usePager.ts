@@ -8,6 +8,7 @@ const usePager = <T>(
   handlePageLoaded: () => void
 ): {
   items: T[];
+  error: boolean;
   loading: boolean;
   lastPageLoaded: boolean;
   startNewQuery: () => void;
@@ -18,17 +19,20 @@ const usePager = <T>(
   const [items, setItems] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [lastPageLoaded, setLastPageLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   const startNewQuery = useCallback(() => {
     setLoading(true);
     setPageIndex(0);
     setLastPageLoaded(false);
     setLastPageIndex(-1);
+    setError(false);
   }, []);
 
   const loadNextPage = useCallback(() => {
     setPageIndex(pageIndex + 1);
     setLoading(true);
+    setError(false);
   }, [pageIndex]);
 
   useEffect(() => {
@@ -54,12 +58,15 @@ const usePager = <T>(
             handlePageLoaded();
           }, 0);
         } catch (e) {
+          // reg#002
+          setLoading(false);
+          setError(true);
           // TODO: add error message
         }
       }
     })();
   }, [handlePageLoaded, items, pageIndex, urlFactory, lastPageIndex]);
-  return { items, loading, lastPageLoaded, startNewQuery, loadNextPage };
+  return { items, loading, error, lastPageLoaded, startNewQuery, loadNextPage };
 };
 
 export default usePager;
